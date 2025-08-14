@@ -1,2 +1,0 @@
-# inetbankingv4
-# DevOps
