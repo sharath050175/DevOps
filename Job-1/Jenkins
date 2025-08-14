@@ -1,24 +1,24 @@
-pipeline {
+pipeline{
     agent any
         tools {
             maven 'Maven'
             jdk 'Java_11'
         }
 
-    stages {
+    stages{
         stage('Git Checkout') {
-            steps {
+            steps{
                 git branch: 'Jenkins', url: 'https://github.com/sharath050175/DevOps.git'
             }
         }
 
         stage('Maven clean') {
-            steps {
-                sh mvn clean'
+            steps{
+                sh 'mvn clean'
             }
         }
         stage('Maven build') {
-            steps {
+            steps{
                 sh 'mvn Build'
             }
         }
