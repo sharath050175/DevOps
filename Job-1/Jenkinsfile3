@@ -1,16 +1,15 @@
-pipeline{
+pipeline {
     agent any
 
-    stages{
+    stages {
         stage('Git Checkout') {
-            steps{
-                git branch: 'Jenkins',url:'https://github.com/sharath050175/DevOps.git'
+            steps {
+                git branch: 'Jenkins', url: 'https://github.com/sharath050175/DevOps.git'
             }
         }
-    }
-    stages{
+
         stage('Build') {
-            steps{
+            steps {
                 echo 'Building the Project'
             }
         }
