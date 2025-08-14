@@ -1,23 +1,38 @@
 pipeline {
     agent any
+
     tools {
-        maven 'Maven'
-        jdk 'Java_11'
+        maven 'Maven' // name from Manage Jenkins > Global Tool Configuration
     }
+
     stages {
+        stage('Declarative: Checkout SCM') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Declarative: Tool Install') {
+            steps {
+                sh 'mvn -version'
+            }
+        }
+
         stage('Git Checkout') {
             steps {
-                git branch: 'Jenkins', url: 'https://github.com/sharath050175/DevOps.git'
+                git branch: 'main', url: 'https://github.com/your-repo.git'
             }
         }
+
         stage('Maven clean') {
             steps {
-                sh 'Maven clean'
+                sh 'mvn clean'
             }
         }
-        stage('Maven package') {
+
+        stage('Maven build') {
             steps {
-                sh 'Maven package'
+                sh 'mvn package'
             }
         }
     }
