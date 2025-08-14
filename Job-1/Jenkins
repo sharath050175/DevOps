@@ -10,14 +10,14 @@ pipeline {
                 git branch: 'Jenkins', url: 'https://github.com/sharath050175/DevOps.git'
             }
         }
-        stage('Maven Clean') {
+        stage('Maven clean') {
             steps {
                 sh 'mvn clean'
             }
         }
-        stage('Maven Package') {
+        stage('Maven package') {
             steps {
-                sh 'mvn package'
+                sh 'Maven package'
             }
         }
     }
