@@ -1,19 +1,23 @@
 pipeline{
     agent any
+        tools {
+            maven 'Maven'
+            jdk 'Java_11'
+        }
     stages{
         stage('Git Checkout'){
             steps{
                 git branch: 'main', url: 'https://github.com/sharath050175/DevOps.git'
             }
         }
-        stage('Build'){
+        stage('Maven clean'){
             steps{
-                echo 'Building the project.'
+                sh 'mvn clean'
             }
         }        
-        stage('Deploy'){
+        stage('Maven Build'){
             steps{
-                echo 'Deploy the Application.'
+                sh 'mvn Build'
             }
         }    
     }
