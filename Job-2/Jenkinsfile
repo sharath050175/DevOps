@@ -1,0 +1,24 @@
+pipeline{
+    agent any
+
+    stages{
+        stage('servier-ip'){
+            steps{
+                sh '''
+                    hostname -I
+                    echo "Server IP Address: $(hostname -I)"
+
+                '''
+            }
+        } 
+        stage('Uptime'){
+            steps{
+                sh '''
+                    uptime
+                    echo "Server IP Address: $(uptime)"
+                '''
+            }
+
+        }
+    }
+}
