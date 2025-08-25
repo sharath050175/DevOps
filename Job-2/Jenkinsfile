@@ -15,7 +15,7 @@ pipeline{
             steps{
                 sh '''
                     uptime
-                    echo "Server IP Address: $(uptime)"
+                    echo 'Server IP Address: $(uptime)'
                 '''
             }
 
