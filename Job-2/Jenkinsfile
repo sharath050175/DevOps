@@ -1,5 +1,7 @@
 pipeline{
-    agent any
+    agent any{
+        label 'prod'
+    }
 
     stages{
         stage('servier-ip'){
