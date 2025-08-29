@@ -9,7 +9,7 @@ pipeline{
         stage('Git checkout'){
             steps {
                 script {
-                    git branch: 'staging', url:'https://github.com/sharath050175/staging.git'
+                    git branch: 'main', url:'https://github.com/sharath050175/DevOps.git'
                 }
             }
         }
