@@ -1,69 +1,78 @@
-pipeline{
+pipeline {
     agent any
 
     tools {
         jdk 'JDK11'
         maven 'Maven'
     }
-    stages{
-        stage('Git checkout'){
+
+    stages {
+        stage('Git checkout') {
             steps {
                 script {
-                    git branch: 'main', url:'https://github.com/sharath050175/DevOps.git'
+                    git branch: 'main', url: 'https://github.com/sharath050175/DevOps.git'
                 }
             }
         }
-        stage('Compile'){
+
+        stage('Compile') {
             steps {
                 script {
                     sh 'mvn compile'
                 }
             }
         }
-        stage('Build){
+
+        stage('Build') {
             steps {
                 script {
                     sh 'mvn clean install'
                 }
             }
         }
-        stage('Build Docker Image'){
+
+        stage('Build Docker Image') {
             steps {
                 script {
                     sh 'docker build -t sharath/project:1 .'
                 }
             }
         }
-        stage('Docker image scan'){
+
+        stage('Docker image scan') {
             steps {
                 script {
                     sh 'trivy image --format table -o trivy-image-report.html sharath/project:1'
                 }
             }
         }
-        stage('Containersation'){
+
+        stage('Containerization') {
             steps {
                 script {
                     sh 'docker run -it -d --name c1 -p 9000:8080 sharath/project:1'
                 }
             }
         }
-        stage('Login to Docker Hub'){
+
+        stage('Login to Docker Hub') {
             steps {
                 script {
-                    withCredentials ([usernamePassword(credentialsId: 'dockerhub-credentials','passwordVariable: 'DOCKER_PASSWORD',usernameVariable: 'DOCKER_PASSWORD',usernameVariable: 'DOCKER_USERNAME')]) {
-                        sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdn'
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials',
+                                                     passwordVariable: 'DOCKER_PASSWORD',
+                                                     usernameVariable: 'DOCKER_USERNAME')]) {
+                        sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
                     }
                 }
             }
         }
-        stage('Pusher Docker Image to Docker Hub'){
+
+        stage('Push Docker Image to Docker Hub') {
             steps {
                 script {
-                       sh 'docker push sharath/project:1'
-                    }
+                    sh 'docker push sharath/project:1'
                 }
             }
-        }                                                          
+        }
     }
 }
