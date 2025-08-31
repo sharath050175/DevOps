@@ -1,41 +1,45 @@
-pipeline{
+pipeline {
     agent any
 
-    tools{
+    tools {
         jdk 'java-11'
         maven 'maven'
-
     }
 
-    stages{
-        stage('git-checkout'){
-                steps{
+    stages {
+        stage('Git Checkout') {
+            steps {
                 git branch: 'main', url: 'https://github.com/sharath050175/DevOps.git'
-                }
-        }    
-         stage('compile'){
-                steps{
-                    sh 'mvn compile'
-                }
-        }    
-         stage('maven build'){
-                steps{
-                    sh 'mvn clean install'
-                }
+            }
         }
-        stage('docker build'){
-                steps{
-                    sh 'docker build -t app .'
-                }
+
+        stage('Compile') {
+            steps {
+                sh 'mvn compile'
+            }
         }
-        stage('containerization'){
-                steps{
-                    sh 'docker run -it -d --name c1 -p 9000:8080 app'
-                }
+
+        stage('Maven Build') {
+            steps {
+                sh 'mvn package'
+            }
         }
-        stage('pushing to docker-hub'){
-                steps{
-                    withCredentials([usernamePassword(
+
+        stage('Docker Build') {
+            steps {
+                sh 'docker build -t app .'
+            }
+        }
+
+        stage('Containerization') {
+            steps {
+                sh 'docker run -d --name c1 -p 9000:8080 app'
+            }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                withCredentials([usernamePassword(
                     credentialsId: 'dockerhub-credentials',
                     usernameVariable: 'USER',
                     passwordVariable: 'PASS'
@@ -44,9 +48,7 @@ pipeline{
                     sh 'docker tag app sharusharath/app:v1'
                     sh 'docker push sharusharath/app:v1'
                 }
-            
+            }
         }
-    }        
+    }
 }
-
-      
