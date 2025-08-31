@@ -2,42 +2,37 @@ pipeline {
     agent any
 
     tools {
-        jdk 'JDK11'
-        maven 'Maven'
+        jdk 'java-11'        // must match Global Tool name
+        maven 'maven'        // must match Global Tool name
     }
 
     stages {
-        stage('Git Checkout') {
+        stage('git-checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/sharath050175/DevOps.git'
             }
-        }
-
-        stage('Compile') {
+        }    
+        stage('compile') {
             steps {
                 sh 'mvn compile'
             }
-        }
-
-        stage('Maven Build') {
+        }    
+        stage('maven build') {
             steps {
-                sh 'mvn package'
+                sh 'mvn clean install'
             }
         }
-
-        stage('Docker Build') {
+        stage('docker build') {
             steps {
                 sh 'docker build -t app .'
             }
         }
-
-        stage('Containerization') {
+        stage('containerization') {
             steps {
-                sh 'docker run -d --name c1 -p 9000:8080 app'
+                sh 'docker run -it -d --name c1 -p 9000:8080 app'
             }
         }
-
-        stage('Push to Docker Hub') {
+        stage('pushing to docker-hub') {
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'dockerhub-credentials',
@@ -50,5 +45,5 @@ pipeline {
                 }
             }
         }
-    }
+    }        
 }
