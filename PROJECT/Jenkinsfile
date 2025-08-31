@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     tools {
-        jdk 'java-11'        // must match Global Tool name
-        maven 'maven'        // must match Global Tool name
+        jdk 'JDK11'        // must match Global Tool name
+        maven 'Maven'        // must match Global Tool name
     }
 
     stages {
