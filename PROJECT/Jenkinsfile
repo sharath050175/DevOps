@@ -12,28 +12,32 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/sharath050175/DevOps.git'
             }
         }    
+
         stage('compile') {
             steps {
                 sh 'mvn compile'
             }
         }    
+
         stage('maven build') {
             steps {
                 sh 'mvn clean install'
             }
         }
+
         stage('docker build') {
             steps {
-                sh 'docker build -t app .'
-                // OR use this if Dockerfile is inside /app
-                // sh 'docker build -t app -f app/Dockerfile ./app'
+                // Building Docker image from Dockerfile inside DevOps folder
+                sh 'docker build -t app -f DevOps/Dockerfile .'
             }
         }
+
         stage('containerization') {
             steps {
                 sh 'docker run -it -d --name c1 -p 9000:8080 app'
             }
         }
+
         stage('pushing to docker-hub') {
             steps {
                 withCredentials([usernamePassword(
@@ -41,7 +45,7 @@ pipeline {
                     usernameVariable: 'USER',
                     passwordVariable: 'PASS'
                 )]) {
-                    sh 'echo $PASS| docker login -u $USER --password-stdin'
+                    sh 'echo $PASS | docker login -u $USER --password-stdin'
                     sh 'docker tag app sharath/app:v1'
                     sh 'docker push sharath/app:v1'
                 }
