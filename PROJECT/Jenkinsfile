@@ -38,12 +38,12 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'docker-hub-credentials',
-                    usernameVariable: 'DOCKER_USERNAME',
-                    passwordVariable: 'DOCKER_PASSWORD'
+                    usernameVariable: 'USER',
+                    passwordVariable: 'PASS'
                 )]) {
-                    sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
-                    sh 'docker tag app sharusharath/app:v1'
-                    sh 'docker push sharusharath/app:v1'
+                    sh 'echo $PASS| docker login -u $USER --password-stdin'
+                    sh 'docker tag app sharath/app:v1'
+                    sh 'docker push sharath/app:v1'
                 }
             }
         }
