@@ -2,63 +2,54 @@ pipeline {
     agent any
 
     tools {
-        jdk 'java-11'
-        maven 'maven'
+        jdk 'java-11'        // must match Global Tool name in Jenkins
+        maven 'maven'        // must match Global Tool name in Jenkins
     }
 
     stages {
-        stage('Git checkout') {
+        stage('git-checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/sharath050175/DevOps.git'
             }
-        }
+        }    
 
-        stage('Compile') {
+        stage('compile') {
             steps {
                 sh 'mvn compile'
             }
-        }
+        }    
 
-        stage('Build') {
+        stage('maven build') {
             steps {
                 sh 'mvn clean install'
             }
         }
 
-        stage('Build Docker Image') {
+        stage('docker build') {
             steps {
-                sh 'docker build -t sharath/project:1 .'
+                // Build Docker image using the absolute path to Dockerfile
+                sh 'docker build -t app -f /var/lib/jenkins/workspace/web-app/Test-1/Dockerfile /var/lib/jenkins/workspace/web-app/Test-1'
             }
         }
 
-        stage('Docker image scan') {
+        stage('containerization') {
             steps {
-                sh 'trivy image --format table -o trivy-image-report.html sharath/project:1'
+                sh 'docker run -it -d --name c1 -p 9000:8080 app || echo "Container already exists"'
             }
         }
 
-        stage('Containerization') {
-            steps {
-                sh 'docker run -d --name c1 -p 9000:8080 sharath/project:1'
-            }
-        }
-
-        stage('Login to Docker Hub') {
+        stage('pushing to docker-hub') {
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'docker-hub-credentials',
-                    usernameVariable: 'DOCKER_USERNAME',
-                    passwordVariable: 'DOCKER_PASSWORD'
+                    usernameVariable: 'USER',
+                    passwordVariable: 'PASS'
                 )]) {
-                    sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+                    sh 'echo $PASS | docker login -u $USER --password-stdin'
+                    sh 'docker tag app sharath/app:v1'
+                    sh 'docker push sharath/app:v1'
                 }
             }
         }
-
-        stage('Push Docker Image to Docker Hub') {
-            steps {
-                sh 'docker push sharath/project:1'
-            }
-        }
-    }
+    }        
 }
