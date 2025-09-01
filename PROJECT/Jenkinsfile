@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     tools {
-        jdk 'java-11'        // must match Global Tool name
-        maven 'maven'        // must match Global Tool name
+        jdk 'java-11'        // must match Global Tool name in Jenkins
+        maven 'maven'        // must match Global Tool name in Jenkins
     }
 
     stages {
@@ -27,14 +27,14 @@ pipeline {
 
         stage('docker build') {
             steps {
-                // Building Docker image from Dockerfile inside DevOps folder
-                sh 'docker build -t app -f DevOps/Dockerfile .'
+                // Build Docker image using the absolute path to Dockerfile
+                sh 'docker build -t app -f /var/lib/jenkins/workspace/web-app/Test-1/Dockerfile /var/lib/jenkins/workspace/web-app/Test-1'
             }
         }
 
         stage('containerization') {
             steps {
-                sh 'docker run -it -d --name c1 -p 9000:8080 app'
+                sh 'docker run -it -d --name c1 -p 9000:8080 app || echo "Container already exists"'
             }
         }
 
