@@ -4,8 +4,8 @@ pipeline {
     }
 
     environment {
-        AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')     // Jenkins credentials ID
-        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY') // Jenkins credentials ID
+        AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
         AWS_DEFAULT_REGION    = "ap-south-1"
     }
 
@@ -18,9 +18,30 @@ pipeline {
             }
         }
 
+        stage('Debug Workspace') {
+            steps {
+                sh 'pwd; ls -R'
+            }
+        }
+
+        stage('Detect Terraform Directory') {
+            steps {
+                script {
+                    if (fileExists('VPC/main.tf')) {
+                        env.TF_DIR = 'VPC'
+                    } else if (fileExists('main.tf')) {
+                        env.TF_DIR = '.'
+                    } else {
+                        error "No Terraform configuration found!"
+                    }
+                    echo "Terraform directory detected: ${env.TF_DIR}"
+                }
+            }
+        }
+
         stage('Plan') {
             steps {
-                dir('VPC') {
+                dir("${env.TF_DIR}") {
                     sh 'terraform init'
                     sh 'terraform plan -out=tfplan'
                     sh 'terraform show -no-color tfplan > tfplan.txt'
@@ -31,7 +52,7 @@ pipeline {
         stage('Approval') {
             steps {
                 script {
-                    def plan = readFile 'VPC/tfplan.txt'
+                    def plan = readFile "${env.TF_DIR}/tfplan.txt"
                     input(
                         message: "Do you want to proceed with Terraform ${params.terraformAction}?",
                         parameters: [
@@ -47,7 +68,7 @@ pipeline {
                 expression { params.terraformAction == 'apply' || params.terraformAction == 'destroy' }
             }
             steps {
-                dir('VPC') {
+                dir("${env.TF_DIR}") {
                     script {
                         if (params.terraformAction == 'apply') {
                             sh 'terraform apply -input=false -auto-approve tfplan'
