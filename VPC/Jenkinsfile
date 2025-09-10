@@ -32,8 +32,12 @@ pipeline {
             steps {
                 script {
                     def plan = readFile 'VPC/tfplan.txt'
-                    input message: "Do you want to proceed with Terraform ${params.terraformAction}?",
-                          parameters: [text(name: 'plan', description: 'Review the plan before proceeding', defaultValue: plan)]
+                    input(
+                        message: "Do you want to proceed with Terraform ${params.terraformAction}?",
+                        parameters: [
+                            text(name: 'plan', description: 'Review the plan before proceeding', defaultValue: plan)
+                        ]
+                    )
                 }
             }
         }
@@ -48,6 +52,7 @@ pipeline {
                         if (params.terraformAction == 'apply') {
                             sh 'terraform apply -input=false -auto-approve tfplan'
                         } else {
+                            input message: "⚠️ Are you sure you want to DESTROY all resources?", ok: "Yes, destroy"
                             sh 'terraform destroy -auto-approve'
                         }
                     }
