@@ -1,58 +1,64 @@
 pipeline {
     parameters {
-        choice(name: 'terraformAction', choices: ['apply', 'destroy'], description: 'choose your terraform action to perform')
+        choice(name: 'terraformAction', choices: ['apply', 'destroy'], description: 'Choose your terraform action to perform')
     }
 
     environment {
-        AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
-        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+        AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')     // Jenkins credentials ID
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY') // Jenkins credentials ID
+        AWS_DEFAULT_REGION    = "ap-south-1"
     }
 
     agent any
 
     stages {
-        stage('checkout') {
+        stage('Checkout') {
             steps {
-                script {
-                    dir("terraform") {
-                        git branch: terraform, url: 'https://github.com/sharath050175/DevOps.git'
-                    }
-                }
-            }
-        }
-        stage('plan') {
-            steps {
-                sh 'pwd; cd VPC/; terraform init'
-                sh 'pwd; cd VPC/; terraform plan -out tfplan'
-                sh 'pwd; cd VPC/; terraform show -no-color tfplan >> tfplan.txt'
+                git branch: 'terraform', url: 'https://github.com/sharath050175/DevOps.git'
             }
         }
 
-        stage('approval') {
+        stage('Plan') {
+            steps {
+                dir('VPC') {
+                    sh 'terraform init'
+                    sh 'terraform plan -out=tfplan'
+                    sh 'terraform show -no-color tfplan > tfplan.txt'
+                }
+            }
+        }
+
+        stage('Approval') {
             steps {
                 script {
                     def plan = readFile 'VPC/tfplan.txt'
-                    input message: "Do you want to proceed with terraform Action...?"
-                    parameters: [text(name: 'plan', description: 'can you review your code one more time', defaultValue: plan)]
+                    input message: "Do you want to proceed with Terraform ${params.terraformAction}?",
+                          parameters: [text(name: 'plan', description: 'Review the plan before proceeding', defaultValue: plan)]
                 }
             }
         }
 
-        stage('Apply or destroy') {
+        stage('Apply or Destroy') {
             when {
-                expression {
-                    return params.terraformAction == 'apply' || params.terraformAction == 'destroy'
-                }
+                expression { params.terraformAction == 'apply' || params.terraformAction == 'destroy' }
             }
             steps {
-                script {
-                    if (params.terraformAction == 'apply') {
-                        sh "pwd; cd VPC/; terraform apply -input=false tfplan"
-                    } else if (params.terraformAction == 'destroy') {
-                        sh "pwd; cd VPC/; terraform destroy -auto-approve"
+                dir('VPC') {
+                    script {
+                        if (params.terraformAction == 'apply') {
+                            sh 'terraform apply -input=false -auto-approve tfplan'
+                        } else {
+                            sh 'terraform destroy -auto-approve'
+                        }
                     }
                 }
             }
+        }
+    }
+
+    post {
+        always {
+            echo "Pipeline finished: ${currentBuild.currentResult}"
         }
     }
 }
