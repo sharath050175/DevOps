@@ -1,6 +1,5 @@
 provider "aws" {
   region = "ap-south-1"
-
 }
 # vpc
 
@@ -69,7 +68,6 @@ resource "aws_route_table_association" "public_subnet_association" {
   route_table_id = aws_route_table.public_route_table.id
   
 }
-
 
 
 
