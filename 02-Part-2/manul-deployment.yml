@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: manual-schedule-pod
+spec:
+  nodeName: manoj-cka-cluster-worker3
+  containers:
+    - name: nginx
+      image: nginx
