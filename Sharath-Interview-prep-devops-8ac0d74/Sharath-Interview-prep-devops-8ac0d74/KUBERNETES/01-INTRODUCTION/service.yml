@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-service
+  namespace: uday
+spec:
+  selector:
+    app: nginx
+  ports:
+    - protocol: TCP
+      port: 80  #this is within cluster
+      targetPort: 8080 #port on container
+
+
