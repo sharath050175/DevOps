@@ -32,7 +32,7 @@ pipeline{
             steps {
                   sh '''
             docker rm -f c1 || true
-            docker run -d --name c1 -p 9000:8080 app
+            docker run -d --name c1 -p 9008:8080 app
             '''                    
             }
         }
