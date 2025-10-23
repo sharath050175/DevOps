@@ -1,0 +1,50 @@
+pipeline{
+    agent any
+
+    tools {
+        jdk 'java-11'
+        maven 'maven'
+    }
+
+    stages{
+        stage('git-checkout') {
+            steps {
+                    git branch: 'Project', url: 'https://github.com/sharath050175/DevOps.git'
+            }
+        }
+        stage('compile') {
+            steps {
+                    sh 'mvn compile'
+            }         
+        }
+        stage('maven build'){
+            steps {
+                    sh 'mvn clean install'
+            }
+        }
+        stage('docker build') {
+            steps {
+                    sh 'docker build -t app .'
+            }
+        }
+        stage('containersation'){
+            steps {
+                  sh 'docker run -it -d --name c1 -p 9000:8080 app'
+                    
+            }
+        }
+        stage('pushing to docker hub'){
+            steps {
+                   withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', 
+                                   passwordVariable: 'DOCKER_PASSWORD', 
+                                   usernameVariable: 'DOCKER_USERNAME')]) {
+                        sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password -stdin'
+                        sh 'docker tag app sharusharath/app:v1'
+                        sh 'docker push sharusharath/app:v1'
+                    }
+                }
+            }
+        }
+    }
+
+
