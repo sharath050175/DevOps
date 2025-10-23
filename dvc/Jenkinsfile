@@ -20,6 +20,7 @@ pipeline{
         stage('maven build'){
             steps {
                     sh 'mvn clean install'
+                    sh 'ls -l target'
             }
         }
         stage('docker build') {
