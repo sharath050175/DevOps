@@ -28,10 +28,12 @@ pipeline{
                     sh 'docker build -t app .'
             }
         }
-        stage('containersation'){
+        stage('containerization'){
             steps {
-                  sh 'docker run -it -d --name c1 -p 9000:8080 app'
-                    
+                  sh '''
+            docker rm -f c1 || true
+            docker run -d --name c1 -p 9000:8080 app
+            '''                    
             }
         }
         stage('pushing to docker hub'){
