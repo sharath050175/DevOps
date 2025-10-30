@@ -6,85 +6,55 @@ pipeline {
     environment {
         AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
         AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
-        AWS_DEFAULT_REGION    = "ap-south-1"
-    }
+       }
 
     agent any
 
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'terraform', url: 'https://github.com/sharath050175/DevOps.git'
-            }
-        }
-
-        stage('Debug Workspace') {
-            steps {
-                sh 'pwd; ls -R'
-            }
-        }
-
-        stage('Detect Terraform Directory') {
-            steps {
                 script {
-                    if (fileExists('VPC/main.tf')) {
-                        env.TF_DIR = 'VPC'
-                    } else if (fileExists('main.tf')) {
-                        env.TF_DIR = '.'
-                    } else {
-                        error "No Terraform configuration found!"
-                    }
-                    echo "Terraform directory detected: ${env.TF_DIR}"
-                }
+                    dir("terraform"){
+                        git branch: 'terraform', url: 'https://github.com/sharath050175/DevOps.git'
             }
+        } 
         }
-
+        }
         stage('Plan') {
             steps {
-                dir("${env.TF_DIR}") {
-                    sh 'terraform init'
-                    sh 'terraform plan -out=tfplan'
-                    sh 'terraform show -no-color tfplan > tfplan.txt'
-                }
+                    sh 'pwd;cd VPC/; terraform init'
+                    sh 'pwd;cd VPC/; terraform plan -out tfplan'
+                    sh 'pwd;cd VPC/; terraform plan -no -color tfplan >> tfplan.txt'
             }
         }
-
-        stage('Approval') {
+        stage('approval') {
             steps {
                 script {
-                    def plan = readFile "${env.TF_DIR}/tfplan.txt"
-                    input(
-                        message: "Do you want to proceed with Terraform ${params.terraformAction}?",
-                        parameters: [
-                            text(name: 'plan', description: 'Review the plan before proceeding', defaultValue: plan)
-                        ]
-                    )
+                    def plan = readFile 'VPC/tfplan.txt'
+                    input message: "Do you want to proceed with terrraform Action...?"
+                    parameters: [text(name: 'plan', description: 'can your review your code one more time!', defaultValue: plan)]
+                    
+                    
                 }
             }
         }
-
         stage('Apply or Destroy') {
             when {
-                expression { params.terraformAction == 'apply' || params.terraformAction == 'destroy' }
+                expression { 
+                    return params.terraformAction == 'apply' || params.terraformAction == 'destroy' 
+                    }
             }
             steps {
-                dir("${env.TF_DIR}") {
-                    script {
+                script {
                         if (params.terraformAction == 'apply') {
-                            sh 'terraform apply -input=false -auto-approve tfplan'
-                        } else {
-                            input message: "⚠️ Are you sure you want to DESTROY all resources?", ok: "Yes, destroy"
-                            sh 'terraform destroy -auto-approve'
+                            sh 'pwd; cd VPC; terraform apply -input=false tfplan'
+                        } else if (params.terraformAction == 'destroy') {
+                            sh "pwd; cd VPC; terraform destroy -auto-approve"
                         }
                     }
                 }
             }
-        }
-    }
+        
+    
+   
 
-    post {
-        always {
-            echo "Pipeline finished: ${currentBuild.currentResult}"
-        }
-    }
-}
