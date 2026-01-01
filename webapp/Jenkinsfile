@@ -1,48 +1,63 @@
-pipeline {
-    agent any
+pipeline{
+    agent any
 
-    tools {
-        jdk 'java-11'
-        maven 'maven'
-    }
+    tools {
+        jdk 'JDK11'
+        maven 'Maven'
+    }
 
-    stages {
-        stage('git-checkout') {
-            steps {
-                git branch:'Live', url: 'https://github.com/sharath050175/DevOps.git'
-            }
-        }
-        // Run Maven inside the correct folder where pom.xml exists
-        stage('compile') {
-            steps {
-                sh 'mvn compile'
-                }
-            }
-        stage('maven build') {
-            steps {
-                sh 'mvn clean install'
-                }
-            }
-        stage('Docker Build') {
-            steps {
-                sh 'docker build -t app .'
-                }
-            }
-        stage('containerization') {
-            steps {
-                sh 'docker run -it -d --name c1 -p 9000:8080 app'
-            }
-        }
-        stage('pushing to docker hub') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'PASS')]) {
-                    sh 'echo $PASS | docker login -u $DOCKER_USERNAME --password-stdin'
-                    sh 'docker tag app sharusharath/app:v1'
-                    sh 'docker push sharusharath/app:v1'
-                }
-            }
-        }
-    }
+    stages{
+        stage('Git checkout') {
+            steps {
+                    git branch: 'main', url: 'https://github.com/RakshithaUmesh1/devopsProject1.git'
+            }
+        }
+        stage('Compile') {
+            steps {
+                    sh 'mvn compile'
+            }         
+        }
+        stage('Build'){
+            steps {
+                    sh 'mvn clean install'
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                    sh 'docker build -t rakshithaghyanesh/devopsproject:1 .'
+            }
+        }
+
+        stage('Docker image scan'){
+            steps {
+                    sh 'trivy image --format table -o trivy-image-report.html rakshithaghyanesh/devopsproject:1'
+            }
+        }
+        stage('Containersation'){
+            steps {
+                    sh '''
+                    docker stop c1 || true
+                    docker rm c1 || true
+                    docker run -it -d --name c1 -p 9000:8080 rakshithaghyanesh/devopsproject:1
+                    '''
+            }
+        }
+        stage('Login to Docker Hub'){
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                        sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+                    }
+                }
+            }
+        }
+
+        stage('Push Docker Image to Docker Hub') {
+            steps {
+                sh 'docker push rakshithaghyanesh/devopsproject:1'
+            }
+            
+        }
+
+    }
 }
-
-
