@@ -3,13 +3,12 @@ provider "aws" {
   access_key = ""
   secret_key = ""
 }
-
 resource "aws_instance" "myinstance" {
     tags = {
-        Name = "Project-Server"  
+        Name = "project-server"
 }
-ami = "ami-02b8269d5e85954ef"
-instance_type = "t2.micro"
+ami = "ami-087d1c9a513324697"
+instance_type = "t3.medium"
 key_name = "Live-key"
 security_groups = ["default"]
 
@@ -20,7 +19,6 @@ root_block_device {
  }
 
 }
-
 output "instance_public_ip" {
     value = aws_instance.myinstance.public_ip
   
