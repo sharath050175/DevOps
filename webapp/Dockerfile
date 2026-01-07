@@ -1,3 +1,4 @@
-FROM tomcat:latest
-RUN cp -R  /usr/local/tomcat/webapps.dist/*  /usr/local/tomcat/webapps
-COPY webapp/target/webapp.war /usr/local/tomcat/webapps
+FROM nginx:latest
+COPY index.html /usr/share/nginx/html/index.html
+EXPOSE 80
+CMD [ "nginx", "-g", "daemon off;" ]
