@@ -3,8 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <title>ShopHub</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+        nav { background: #6c5ce7; padding: 1em; color: white; }
+        nav a { margin: 0 1em; color: white; text-decoration: none; }
+        .categories { padding: 1em; background: #f1f1f1; }
+        .categories button { margin: 0.5em; padding: 0.5em 1em; }
+        .products { display: flex; flex-wrap: wrap; padding: 1em; }
+        .product { border: 1px solid #ddd; margin: 1em; padding: 1em; width: 200px; }
+        .footer { background: #f1f1f1; padding: 1em; margin-top: 2em; }
+    </style>
 </head>
 <body>
-    <h1>ShopHub</h1>
+    <nav>
+        <span><strong>ShopHub</strong></span>
+        <a href="#">Home</a>
+        <a href="#">Categories</a>
+        <a href="#">Deals</a>
+        <a href="#">Contact</a>
+        <button style="float:right;">Login</button>
+    </nav>
+
+    <section class="categories">
+        <h2>Browse by Categories</h2>
+        <button>Electronics</button>
+        <button>Fashion</button>
+        <button>Home & Kitchen</button>
+        <button>Books</button>
+        <button>Sports</button>
+        <button>Toys</button>
+    </section>
+
+    <section class="products">
+        <div class="product">
+            <h3>Smartphone X1</h3>
+            <p>$499.00</p>
+            <button>Add to Cart</button>
+        </div>
+        <div class="product">
+            <h3>Noise Cancelling Headphones</h3>
+            <p>$199.00</p>
+            <button>Add to Cart</button>
+        </div>
+        <div class="product">
+            <h3>4K Smart TV</h3>
+            <p>$899.00</p>
+            <button>Add to Cart</button>
+        </div>
+        <div class="product">
+            <h3>Kitchen Mixer</h3>
+            <p>$120.00</p>
+            <button>Add to Cart</button>
+        </div>
+        <div class="product">
+            <h3>Sports Watch</h3>
+            <p>$89.99</p>
+            <button>Add to Cart</button>
+        </div>
+        <div class="product">
+            <h3>Children's Toy Set</h3>
+            <p>$35.00</p>
+            <button>Add to Cart</button>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <h2>Why Shop with Us?</h2>
+        <ul>
+            <li>Trusted by thousands</li>
+            <li>24/7 Customer Support</li>
+            <li>Secure Payments</li>
+            <li>Easy Returns</li>
+        </ul>
+    </footer>
 </body>
 </html>
