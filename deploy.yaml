@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: my-deploy-app
-spec:
+spec:  # ✅ spec is under metadata correctly
   replicas: 2
   selector:
     matchLabels:
@@ -22,7 +22,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: devops-Service-v6
-spec:
+spec:  # ✅ spec is under metadata
   type: NodePort
   selector:
     app: my-app
