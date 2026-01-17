@@ -1,7 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-deploy-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+      - name: devops-app-c5
+        image: sharusharath/test-dev:latest
+        ports:
+        - containerPort: 80
+---
 apiVersion: v1
 kind: Service
 metadata:
-  name: devops-service-v6  # ✅ lowercase only
+  name: devops-service-v6   # ✅ all lowercase now
 spec:
   type: NodePort
   selector:
